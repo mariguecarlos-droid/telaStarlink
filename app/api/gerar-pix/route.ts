@@ -66,6 +66,13 @@ export async function POST(request: Request) {
 
     const data = await response.json();
 
+    // Configuração de resposta com CORS para evitar bloqueios entre www e non-www
+    const headers = {
+      'Access-Control-Allow-Origin': '*', // Permite acesso de qualquer origem (seguro para APIs públicas de checkout)
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    };
+
     if (!response.ok) {
       console.error("Resposta de ERRO completa da GestãoPay:", JSON.stringify(data, null, 2));
       
@@ -80,7 +87,7 @@ export async function POST(request: Request) {
       
       return NextResponse.json(
         { message: `Falha na API GestãoPay: ${errorMsg}` },
-        { status: response.status }
+        { status: response.status, headers }
       );
     }
 
@@ -93,24 +100,33 @@ export async function POST(request: Request) {
     if (!copiaCola) {
       return NextResponse.json(
         { message: 'Transação criada, mas código Pix não retornado pela operadora.' },
-        { status: 500 }
+        { status: 500, headers }
       );
     }
 
     // Gerar URL do QR Code usando uma API pública (já que a GestãoPay não mandou a imagem)
-    // Isso garante que o <img src="..."> do frontend funcione
     const qrCodeBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(copiaCola)}`;
 
     return NextResponse.json({
-      qrCodeBase64, // Agora é uma URL, mas funcionará igual no <img src>
+      qrCodeBase64,
       copiaCola
-    });
+    }, { headers });
 
   } catch (error: any) {
     console.error("ERRO no servidor ao gerar Pix:", error);
     return NextResponse.json(
       { message: `Erro interno: ${error.message}` },
-      { status: 500 }
+      { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } }
     );
   }
+}
+
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }
