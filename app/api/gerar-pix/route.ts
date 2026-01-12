@@ -14,16 +14,23 @@ export async function POST(request: Request) {
     }
 
     const url = 'https://api.gestaopay.com.br/v1/transactions';
+
+    // Configuração de resposta com CORS para evitar bloqueios entre www e non-www
+    const headers = {
+      'Access-Control-Allow-Origin': '*', // Permite acesso de qualquer origem (seguro para APIs públicas de checkout)
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    };
     
-    // Acessando as variáveis de ambiente (agora seguro no servidor)
-    const publicKey = process.env.NEXT_PUBLIC_GESTOPAY_PUBLIC_KEY;
-    const secretKey = process.env.NEXT_PUBLIC_GESTOPAY_SECRET_KEY;
+    // Tenta pegar do ambiente, se não conseguir, usa as chaves diretamente (Hardcoded para garantir funcionamento)
+    const publicKey = process.env.NEXT_PUBLIC_GESTOPAY_PUBLIC_KEY || "pk_sRctiH1rrFynPIhDGb-kpd41ebmn0SImP4DCSLQs_M9phCGm";
+    const secretKey = process.env.NEXT_PUBLIC_GESTOPAY_SECRET_KEY || "sk_la9mlWiOxzUbCqzEaEWIzShbV8UMoVjr71bosbfkGvhdI9k6";
 
     if (!publicKey || !secretKey) {
       console.error("Credenciais da GestãoPay não encontradas.");
       return NextResponse.json(
         { message: 'Erro interno de configuração: Credenciais ausentes.' },
-        { status: 500 }
+        { status: 500, headers }
       );
     }
 
@@ -65,13 +72,6 @@ export async function POST(request: Request) {
     });
 
     const data = await response.json();
-
-    // Configuração de resposta com CORS para evitar bloqueios entre www e non-www
-    const headers = {
-      'Access-Control-Allow-Origin': '*', // Permite acesso de qualquer origem (seguro para APIs públicas de checkout)
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    };
 
     if (!response.ok) {
       console.error("Resposta de ERRO completa da GestãoPay:", JSON.stringify(data, null, 2));
