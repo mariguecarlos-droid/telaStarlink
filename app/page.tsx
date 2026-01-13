@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Check, Wifi, MapPin, Zap, Shield, Phone, Star, Users, Clock, Award, Sparkles, Rocket, Radio, Circle, Copy, X, Loader2 } from "lucide-react";
 
 export default function Home() {
@@ -187,12 +188,15 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Wifi className="w-10 h-10 text-cyan-400 animate-pulse" />
-              <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1 animate-spin" />
+              <Image 
+                src="/lgoo.png" 
+                alt="Starlink Chip Logo" 
+                width={150} 
+                height={40} 
+                className="filter invert" // Adiciona um filtro para inverter as cores, transformando o logo preto em branco.
+              />
             </div>
             <div>
-              <span className="text-2xl md:text-3xl font-bold text-white tracking-tight">Starlink</span>
-              <span className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400"> Chip</span>
               <div className="flex items-center gap-1 mt-0.5">
                 <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
                 <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
